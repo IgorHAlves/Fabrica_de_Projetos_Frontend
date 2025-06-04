@@ -41,6 +41,12 @@
               >
                 {{ categoria.nome }}
               </td>
+              <td class=" flex justify-between px-10 py-5 border-r border-b border-blue-400 dark:border-blue-700">
+              <router-link :to="`/editar/${categoria.id}`">
+                <button class="w-20 h-8 bg-blue-700 rounded lg">Editar</button>
+              </router-link>
+              <button @click="excluirCategoria(categoria.id)" class="w-20 h-8 bg-red-700 rounded lg">Excluir</button>
+            </td>
             </tr>
           </tbody>
         </table>
@@ -70,6 +76,22 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+
+const excluirCategoria = async(id) => {
+  const confirmacao = confirm("Após exclusão os dados não poderão ser recuperados")
+  if (!confirmacao) {
+    return false;
+  }
+  try {
+    await axios.delete(`https://localhost:7256/v1/categorias/${id}`)
+      alert("Produto excluído com sucesso!");
+      fetchCategoria();
+
+  } catch (error) {
+    console.error("erro ao excluir categoria", error);
+    alert("Erro ao excluir categoria.");
+  }
+}
 
 const router = useRouter();
 const categorias = ref([]);

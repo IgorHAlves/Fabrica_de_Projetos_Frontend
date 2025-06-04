@@ -5,6 +5,8 @@ import CategoriaView from "../views/CategoriaView.vue";
 import CadastroProdutoView from "../views/CadastroProdutoView.vue";
 import CadastroCategoriaView from "../views/CadastroCategoriaView.vue";
 import EdicaoView from "../views/EdicaoView.vue";
+import EdicaoCategoriaView from "../views/EdicaoCategoriaView.vue";
+import EdicaoProdutoView from "@/views/EdicaoProdutoView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,7 +39,12 @@ const router = createRouter({
     {
       path: "/editar/:id",
       name: "editarproduto",
-      component: EdicaoView,
+      component: EdicaoProdutoView,
+    },
+    {
+      path: "/editarCAtegoria/:id",
+      name: "editarCategoria",
+      component: EdicaoCategoriaView,
     },
   ],
 });
