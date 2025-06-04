@@ -56,7 +56,7 @@
               <router-link :to="`/editar/${produto.id}`">
                 <button class="w-20 h-8 bg-blue-700 rounded lg">Editar</button>
               </router-link>
-              <button class="w-20 h-8 bg-red-700 rounded lg">Excluir</button>
+              <button @click="excluirProduto(produto.id)" class="w-20 h-8 bg-red-700 rounded lg">Excluir</button>
             </td>
           </tr>
         </tbody>
@@ -79,6 +79,23 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+
+
+const excluirProduto = async(id) => {
+  const confirmacao = confirm("Após exclusão os dados não poderão ser recuperados")
+  if (!confirmacao) {
+    return false;
+  }
+  try {
+    await axios.delete(`https://localhost:7256/v1/produtos/${id}`)
+      alert("Produto excluído com sucesso!");
+      fetchProduto();
+
+  } catch (error) {
+    console.error("erro ao excluir item", error);
+    alert("Erro ao excluir produto.");
+  }
+}
 
 const router = useRouter();
 
