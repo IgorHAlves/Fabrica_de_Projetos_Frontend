@@ -3,6 +3,6 @@
     <p class="text-sm">
       {{ new Date().getFullYear() }} Desenvolvido por Alunos - UNIMAR
     </p>
-    <p class="text-xs mt-2">Igor, Rafael, Caio, Caue e Cesar</p>
+    <p class="text-xs mt-2">Igor, Rafael, Caio, Cauê e Cesar</p>
   </footer>
 </template>
