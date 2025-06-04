@@ -4,7 +4,6 @@ import ProductView from "../views/ProductView.vue";
 import CategoriaView from "../views/CategoriaView.vue";
 import CadastroProdutoView from "../views/CadastroProdutoView.vue";
 import CadastroCategoriaView from "../views/CadastroCategoriaView.vue";
-import EdicaoView from "../views/EdicaoView.vue";
 import EdicaoCategoriaView from "../views/EdicaoCategoriaView.vue";
 import EdicaoProdutoView from "@/views/EdicaoProdutoView.vue";
 

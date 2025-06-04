@@ -25,24 +25,26 @@
               >
                 ID
               </th>
-              <th scope="col" class="px-10 py-5">Nome</th>
+              <th scope="col" class="px-10 py-5 border-r border-l border-blue-400 dark:border-blue-700">Nome</th>
+                            <th scope="col" class="px-10 py-5"></th>
+
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="categoria in categorias" :key="categoria.id">
               <td
-                class="px-10 py-5 border-r border-blue-400 dark:border-blue-700"
+                class="px-10 py-5 border-r border-l border-b border-blue-400 dark:border-blue-700"
               >
                 {{ categoria.id }}
               </td>
               <td
-                class="px-10 py-5 border-r border-blue-400 dark:border-blue-700"
+                class="px-10 py-5 border-r border-b border-blue-400 dark:border-blue-700"
               >
                 {{ categoria.nome }}
               </td>
-              <td class=" flex justify-between px-10 py-5 border-r border-b border-blue-400 dark:border-blue-700">
-              <router-link :to="`/editar/${categoria.id}`">
+              <td class=" flex justify-between px-10 py-5 border-r border-b border-blue-400 dark:border-blue-700 ">
+              <router-link :to="`/editarCAtegoria/${categoria.id}`">
                 <button class="w-20 h-8 bg-blue-700 rounded lg">Editar</button>
               </router-link>
               <button @click="excluirCategoria(categoria.id)" class="w-20 h-8 bg-red-700 rounded lg">Excluir</button>
@@ -84,7 +86,7 @@ const excluirCategoria = async(id) => {
   }
   try {
     await axios.delete(`https://localhost:7256/v1/categorias/${id}`)
-      alert("Produto excluído com sucesso!");
+      alert("Categoria excluída com sucesso!");
       fetchCategoria();
 
   } catch (error) {
