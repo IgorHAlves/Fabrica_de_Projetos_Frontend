@@ -32,7 +32,7 @@
       <!-- Área de Conteúdo Principal -->
       <div v-else>
         <!-- Seção de Métricas Simplificada -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"> <!-- Alterado para grid-cols-2 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"> 
           <!-- Total de Produtos Listados -->
           <div class="bg-purple-50 dark:bg-purple-900 p-4 rounded-lg shadow-md flex items-center">
              <div class="bg-purple-100 dark:bg-purple-800 p-3 rounded-full mr-4">
@@ -62,14 +62,11 @@
                 </h3>
               </div>
           </div>
-
-          <!-- Card de Valor Total em Estoque REMOVIDO -->
-
         </div>
 
         <!-- Seção do Gráfico -->
         <div class="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6">
-           <div class="h-80 md:h-96">
+           <div class="h-80 md:h-96"> 
               <canvas ref="vendasPorCategoriaChart"></canvas>
            </div>
         </div>
@@ -93,7 +90,7 @@ const error = ref(null);
 const vendasPorCategoriaChart = ref(null); 
 let chartInstance = null; 
 
-// Métricas simplificadas (sem valorEstoque)
+// Métricas simplificadas
 const metricas = ref({
   totalProdutosListados: 0, 
   totalVendido: 0, 
@@ -105,42 +102,21 @@ const dadosVendasPorCategoria = ref({
     {
       label: "Quantidade Vendida", 
       data: [],
-      backgroundColor: [
-        "rgba(54, 162, 235, 0.6)",
-        "rgba(255, 99, 132, 0.6)",
-        "rgba(255, 206, 86, 0.6)",
-        "rgba(75, 192, 192, 0.6)",
-        "rgba(153, 102, 255, 0.6)",
-        "rgba(255, 159, 64, 0.6)" 
-      ],
-      borderColor: [
-        "rgba(54, 162, 235, 1)",
-        "rgba(255, 99, 132, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(153, 102, 255, 1)",
-        "rgba(255, 159, 64, 1)"
-      ],
-      borderWidth: 1,
+      backgroundColor: [], 
+      borderColor: [],
+      borderWidth: 0, // Gradientes geralmente não precisam de borda explícita
     },
   ],
 });
 
-// --- Chamadas API --- 
+// --- Chamadas API  --- 
 const fetchProdutosEPorCategoria = async () => {
   try {
     const responseProdutos = await axios.get(`${API_BASE_URL}/produtos/offset/0/limit/1000`);
     const results = responseProdutos.data?.data || []; 
     produtos.value = results;
-
-    // Calcula apenas o total de produtos listados
     metricas.value.totalProdutosListados = results.length; 
-
-    // Cálculo do valorEstoque REMOVIDO
-
-    // Processa os dados para o gráfico de categorias
     atualizarDadosVendasPorCategoria(results);
-
   } catch (err) {
     console.error("Erro ao buscar lista de produtos:", err);
     throw new Error("Falha ao carregar dados dos produtos.");
@@ -173,10 +149,8 @@ const atualizarDadosVendasPorCategoria = (produtosParaProcessar) => {
   dadosVendasPorCategoria.value.datasets[0].data = Object.values(categorias);
 };
 
-// --- Inicialização do Gráfico --- 
+// --- Inicialização do Gráfico (BARRAS COM GRADIENTES) --- 
 const initChart = async () => {
-  // await nextTick(); // nextTick movido para onMounted para garantir execução após loading=false
-
   if (chartInstance) {
     chartInstance.destroy();
     chartInstance = null;
@@ -185,15 +159,56 @@ const initChart = async () => {
   if (vendasPorCategoriaChart.value) {
     const ctx = vendasPorCategoriaChart.value.getContext("2d");
     if (ctx) {
-        const isDarkMode = document.documentElement.classList.contains('dark');
-        const textColor = isDarkMode ? '#FFFFFF' : '#333333';
-        const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+        const isDarkMode = document.documentElement.classList.contains("dark");
+        const textColor = isDarkMode ? 'hsl(210, 15%, 85%)' : 'hsl(210, 15%, 45%)';
+        const gridColor = isDarkMode ? 'hsla(210, 15%, 85%, 0.1)' : 'hsla(210, 15%, 45%, 0.1)';
+        const titleColor = isDarkMode ? 'hsl(210, 15%, 95%)' : 'hsl(210, 20%, 25%)';
+
+        // Função para criar gradientes horizontais
+        const createGradient = (color1, color2) => {
+            const gradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0); // Gradiente da esquerda para direita
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+            return gradient;
+        };
+
+        // Paleta de cores base para os gradientes 
+        const baseColors = [
+            { start: 'rgba(54, 162, 235, 1.0)', end: 'rgba(54, 162, 235, 0.8)' }, // Azul 
+            { start: 'rgba(255, 99, 132, 1.0)', end: 'rgba(255, 99, 132, 0.8)' }, // Rosa 
+            { start: 'rgba(75, 192, 192, 1.0)', end: 'rgba(75, 192, 192, 0.8)' }, // Verde-água 
+            { start: 'rgba(153, 102, 255, 1.0)', end: 'rgba(153, 102, 255, 0.8)' }, // Roxo 
+            { start: 'rgba(255, 159, 64, 1.0)', end: 'rgba(255, 159, 64, 0.8)' }, // Laranja 
+            { start: 'rgba(255, 206, 86, 1.0)', end: 'rgba(255, 206, 86, 0.8)' }, // Amarelo 
+        ];
+
+        // Aplicar gradientes aos dados
+        const backgroundGradients = dadosVendasPorCategoria.value.labels.map((_, index) => {
+            const colors = baseColors[index % baseColors.length];
+            return createGradient(colors.start, colors.end);
+        });
+
+        // Clona o dataset original
+        const originalDataset = JSON.parse(JSON.stringify(dadosVendasPorCategoria.value.datasets[0]));
+
+        // Atualiza o dataset com os gradientes
+        const updatedDataset = {
+            ...originalDataset,
+            backgroundColor: backgroundGradients,
+            borderColor: backgroundGradients, // Pode usar o próprio gradiente como borda
+            borderWidth: 0, // Sem borda explícita
+            borderRadius: 5, // Bordas levemente arredondadas
+            borderSkipped: false,
+        };
 
         chartInstance = new Chart(ctx, {
-        type: "bar", 
-        data: dadosVendasPorCategoria.value, 
+        type: "bar", // <<< VOLTOU PARA BARRA
+        data: {
+            labels: dadosVendasPorCategoria.value.labels,
+            datasets: [updatedDataset]
+        }, 
         options: {
-          indexAxis: "y", 
+          indexAxis: "y", // <<< EIXO Y PARA BARRAS HORIZONTAIS
           responsive: true, 
           maintainAspectRatio: false, 
           plugins: {
@@ -201,18 +216,55 @@ const initChart = async () => {
             title: { 
                 display: true,
                 text: 'Quantidade Vendida por Categoria',
-                color: textColor, 
-                font: { size: 16 }
+                color: titleColor, 
+                font: { 
+                    size: 16, 
+                    family: 'system-ui, sans-serif',
+                    weight: '500'
+                },
+                padding: { top: 10, bottom: 20 }
+            },
+            tooltip: { 
+                backgroundColor: isDarkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)',
+                titleColor: titleColor,
+                bodyColor: textColor,
+                borderColor: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                borderWidth: 1,
+                padding: 8,
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.x !== null) {
+                            label += new Intl.NumberFormat('pt-BR').format(context.parsed.x);
+                        }
+                        return label;
+                    }
+                }
             }
           },
-          scales: { 
+          scales: { // <<< ESCALAS REINTRODUZIDAS
             x: { 
-                grid: { color: gridColor }, 
-                ticks: { color: textColor } 
+                beginAtZero: true,
+                grid: { 
+                    color: gridColor, 
+                    drawBorder: false 
+                }, 
+                ticks: { 
+                    color: textColor, 
+                    font: { size: 10, family: 'system-ui, sans-serif' } 
+                } 
             },
             y: { 
-                grid: { display: false }, 
-                ticks: { color: textColor } 
+                grid: { 
+                    display: false 
+                }, 
+                ticks: { 
+                    color: textColor, 
+                    font: { size: 11, family: 'system-ui, sans-serif' } 
+                } 
             },
           },
         },
@@ -227,7 +279,7 @@ const initChart = async () => {
   }
 };
 
-// --- Hook de Ciclo de Vida (com logs de depuração) --- 
+// --- Hook de Ciclo de Vida  --- 
 onMounted(async () => {
   console.log("Componente montado, iniciando busca de dados...");
   loading.value = true;
