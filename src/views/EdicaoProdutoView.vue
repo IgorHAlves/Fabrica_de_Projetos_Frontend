@@ -20,6 +20,12 @@
                         placeholder="Ex: 99.90" required />
                 </div>
 
+                       <div class="mb-4">
+                    <label class="block text-gray-700 mb-1 font-semibold">Quantidade Vendida</label>
+                    <input type="number" v-model="quantidadeVenda"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        placeholder="Ex: 100" required />
+                </div>
 
                 <div class="mb-4">
                     <label class="block text-gray-700 mb-1 font-semibold">Categoria</label>
@@ -27,6 +33,7 @@
                         class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         placeholder="Ex: 10" required />
                 </div>
+                
 
                 <button type="submit"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
@@ -48,19 +55,25 @@ const produtoId = route.params.id;
 
 const nome = ref("");
 const preco = ref("");
+const quantidadeVenda = ref("");
+
 const idCategoria = ref("");
 
 const editarProduto = async() => {
     try {
         const response = await axios.get(`https://localhost:7256/v1/produtos/${produtoId}`)
-        const produto = response.data;
+        const produto = response.data.data;
+        console.log(produto);
+        
         nome.value = produto.nome
-        idCategoria.value = produto.idCategoria
+        quantidadeVenda.value = produto.quantidadeVenda
+        console.log(quantidadeVenda.value);
+        
+        idCategoria.value = produto.categoria.id
         preco.value = produto.preco
 
     } catch (error) {
         console.error("Erro ao carregar produto", error);
-        
     }
 }
 
@@ -68,6 +81,7 @@ async function atualizacaoDados() {
     const atualizacaoDados = {
         nome: nome.value,
         preco: preco.value,
+        quantidadeVenda: quantidadeVenda.value,
         idCategoria: idCategoria.value,
     };
 

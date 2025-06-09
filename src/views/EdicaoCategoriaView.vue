@@ -36,7 +36,7 @@ const nomeCategoria = ref("")
 const editarCategoria = async() => {
     try {
         const response = await axios.get(`https://localhost:7256/v1/categorias/${categoriaId}`)
-        const categoria = response.data;
+        const categoria = response.data.data;
         nomeCategoria.value = categoria.nome
        
 
